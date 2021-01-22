@@ -19,3 +19,32 @@ function isValidWalk(walk){
   }  
 }
 
+//question 2 in JavaScript 
+function findOutlier(integers){
+   var evens = []; // create an empty array of evens 
+   var odds = []; // create an empty array of odds
+   for (var i = 0; i < integers.length; i++)  // for loop to check the length of integers 
+   {
+       if ((integers[i] % 2) == 0) // if integers of even or odd are the modulo to equal zero 
+       {
+           evens.push(integers[i]); // then push the integer in a even array 
+       } 
+       else 
+       {
+           odds.push(integers[i]);// else push the integer in a odd array 
+       }
+   }
+   var elen = evens.length; // initialize a variable to the even array length
+   var olen = odds.length; // initialize a variable to the odd array length
+
+   if (elen > olen) // if even array is greater than the odd array in length 
+   {
+       return odds[0]; // then a single value of odd from an array will return
+   } 
+   else 
+   {
+       return evens[0];  // else a single value of even from an array will return
+   }
+}
+
+
