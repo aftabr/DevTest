@@ -46,5 +46,186 @@ function findOutlier(integers){
        return evens[0];  // else a single value of even from an array will return
    }
 }
+// Attempt of Question 3 in JavaScript
+var Tile = function(options){
+    this.state = options.state;
+    this.board = options.board;
+    this.game = options.game;
+    this.node = options.node;
+    this.addHandler();
+    this.update();
+};
 
+Tile.prototype.handler = function(){
+    this.state = this.game.nextState;
+    this.game.playCallback(this);
+    this.update();
+    this.removeHandler();
+};
+
+Tile.prototype.addHandler = function(){
+    this.node.bind('click', this.handler.bind(this));
+    this.node.css('cursor', 'pointer');
+};
+Tile.prototype.removeHandler = function(){
+    this.node.unbind('click');
+    this.node.css('cursor', 'default');
+};
+Tile.prototype.update = function(){
+    this.node.text(this.state.tile);
+};
+
+var Board = function(width, height, size, game){
+    var node,i,j;
+    this.game = game;
+    this.width = width;
+    this.height = height;
+    
+    this.tiles = [];
+    this.node = $("<div></div>");
+    this.node.css({
+        position:'relative',
+        'float':'left',
+        width: (width * size+10) + 'px',
+        height: (height * size+10) + 'px'
+    });
+    for (i = 0; i < width; i++){
+        this.tiles[i] = [];
+        for (j = 0; j < height; j++){
+            node = $("<div></div>");
+            node.addClass('tile');
+            node.css({
+                position : 'absolute',
+                width : size + 'px',
+                height : size + 'px',
+                left : i*(size+1) + 'px',
+                top : j*(size+1) + 'px',
+                backgroundColor : '#aaa'
+            });
+            
+            this.tiles[i][j] = new Tile({
+                state:Board.State.Empty,
+                board:this,
+                node:node,
+                game:this.game
+            });
+            this.node.append(this.tiles[i][j].node);
+        }
+    }
+};
+
+Board.State = {
+    Empty: {n:0, tile:' '},
+    X: {n:1, tile:'X'},
+    O: {n:2, tile:'O'}
+};
+
+Board.prototype.addToDom = function(){
+    $("body").append(this.node);
+};
+
+Board.prototype.declareVictory = function(winState){
+    var i,j;
+    for (i = 0; i < this.width; i++){
+        for (j = 0; j < this.height; j++){
+            this.tiles[i][j].state = winState;
+            this.tiles[i][j].update();
+            this.tiles[i][j].removeHandler();
+        }
+    }    
+};
+
+var winConditions = {};
+winConditions.normal = function(board){
+    var row, col, diag, state, win;
+    //check rows:
+    for (row = 0; row < board.height; row++){
+        state = board.tiles[0][row].state;
+        if (state !== Board.State.Empty){
+            win = true;
+            for (col = 1; col < board.width; col++){                
+                if (board.tiles[col][row].state !== state){
+                    win = false;
+                    break;    
+                }
+            }
+            if (win){
+                return state;    
+            }
+        }
+    }
+    
+    //check columns:
+    for (col = 0; col < board.width; col++){
+        state = board.tiles[col][0].state;
+        if (state !== Board.State.Empty){
+            win = true;
+            for (row = 1; row < board.height; row++){                
+                if (board.tiles[col][row].state !== state){
+                    win = false;
+                    break;    
+                }
+            }
+            if (win){
+                return state;    
+            }
+        }
+    }
+    
+    //Check Diagonals
+    if (board.width === board.height){
+        state = board.tiles[0][0].state;
+        if (state !== Board.State.Empty){
+            win = true;
+            for (diag = 1; diag < board.height; diag++){             
+                if (board.tiles[diag][diag].state !== state){
+                    win = false;
+                    break;    
+                }
+            }
+            if (win){
+                return state;    
+            }
+        }    
+        state = board.tiles[board.width-1][0].state;
+        if (state !== Board.State.Empty){
+            win = true;
+            for (diag = 1; diag < board.height; diag++){                
+                if (board.tiles[board.width-1-diag][diag].state !== state){
+                    win = false;
+                    break;    
+                }
+            }
+            if (win){
+                return state;    
+            }
+        }
+    }
+};
+
+
+var Game = function(options){
+    this.board = new Board(options.width, options.height, 20, this);
+    this.board.addToDom();
+    this.nextState = Board.State.X;
+    this.winCheck = options.check;
+};
+
+Game.prototype.playCallback = function(tile){
+    if (this.nextState === Board.State.X){
+        this.nextState = Board.State.O;    
+    } else {
+        this.nextState = Board.State.X;    
+    }
+    var winCheck = this.winCheck(this.board); 
+    if (winCheck !== undefined){
+        this.board.declareVictory(winCheck);
+    }
+};
+
+var x;
+x = new Game({width:3, height:3, check: winConditions.normal});
+x = new Game({width:3, height:3, check: winConditions.normal});
+x = new Game({width:3, height:3, check: winConditions.normal});
+x = new Game({width:10, height:10, check: winConditions.normal});
 
