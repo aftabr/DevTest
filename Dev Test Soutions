@@ -1,0 +1,21 @@
+//question 1 in JavaScript
+
+function isValidWalk(walk){
+  let northsouth = 0, eastwest = 0; //  created two variables and initialize to 0 for tracking the walk
+  if (walk.length === 10) {/ if statement to count the length of a walk that has to be for 10 minutes
+	   for(let i of walk){ // for loop for every block single we walk then respectively we will increment and decrement by 1. 
+		  if (i == 'n') northsouth += 1; // if we move in north direction then north south step will increment  
+		   if (i == 's') northsouth -= 1; // if we move in south direction then north south direction will be reversed back
+		   if (i == 'e') eastwest += 1; // if we move in east direction then east west step will be increment
+		   if (i == 'w') eastwest -= 1; // if we move in west direction then  east west will be reversed back 
+	   }
+  } else { 
+	  return false // else return false 
+	  if(northsouth === 0 && eastwest === 0){ // then finally we can check if we returned to our same position of the walk or not 
+		 return true;
+	  } else {
+		  return false 
+	  }
+  }  
+}
+
